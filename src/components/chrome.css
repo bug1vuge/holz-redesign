@@ -1,5 +1,6 @@
 /* футер */
-.ftr { padding: clamp(72px, 10vw, 140px) 0 32px; position: relative; overflow: hidden; }
+/* снизу место под плавающие кнопку мессенджеров и плашку cookie, чтобы они не закрывали последнюю строку */
+.ftr { --fixed-space: calc(clamp(16px, 2.4vw, 32px) + 60px); padding: clamp(72px, 10vw, 140px) 0 calc(max(var(--fixed-space), var(--cookie-space, 0px)) + 20px); position: relative; overflow: hidden; }
 .ftr__cta { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; padding-bottom: clamp(48px, 7vw, 100px); border-bottom: 1px solid var(--line-d); }
 .ftr__big { margin-top: 16px; font-size: clamp(52px, 8vw, 132px); }
 .ftr__grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1.2fr; gap: 40px; padding: 56px 0; }

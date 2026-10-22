@@ -216,7 +216,7 @@ export function Designers() {
         <section className="container">
           <div className="tiers">
             {TIERS.map((t, i) => (
-              <div key={t.name} className={"tier" + (i === 1 ? " tier--accent" : "")} data-reveal data-delay={i * 0.08}>
+              <div key={t.name} className={"tier" + (i === 1 ? " tier--accent dark" : "")} data-reveal data-delay={i * 0.08}>
                 <span className="eyebrow">{t.cond}</span>
                 <div className="tier__name">{t.name}</div>
                 <ul>{t.perks.map(p => <li key={p}>{p}</li>)}</ul>

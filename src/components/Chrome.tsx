@@ -115,6 +115,16 @@ export function CookieBar() {
     const t = setTimeout(() => setShow(true), 3200);
     return () => clearTimeout(t);
   }, []);
+  // пока плашка видна, низ футера поднимается над ней — иначе она закрывает копирайт
+  useEffect(() => {
+    const el = ref.current, root = document.documentElement;
+    if (!show || !el) { root.style.removeProperty("--cookie-space"); return; }
+    const set = () => root.style.setProperty("--cookie-space", `${Math.ceil(window.innerHeight - el.getBoundingClientRect().top + (Number(gsap.getProperty(el, "y")) || 0))}px`);
+    set();
+    const ro = new ResizeObserver(set); ro.observe(el);
+    window.addEventListener("resize", set);
+    return () => { ro.disconnect(); window.removeEventListener("resize", set); root.style.removeProperty("--cookie-space"); };
+  }, [show]);
   useEffect(() => {
     if (show && ref.current && !prefersReduced()) gsap.fromTo(ref.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "expo.out" });
   }, [show]);
