@@ -41,6 +41,11 @@
 html { -webkit-text-size-adjust: 100%; }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
+/* открыто модальное окно: прокрутки нет, место полосы прокрутки занимает отступ */
+html.is-locked { overflow: hidden; }
+html.is-locked body { padding-right: var(--sbw, 0px); }
+html.is-locked .hdr { padding-right: var(--sbw, 0px); }
+html.is-locked .msgr { margin-right: var(--sbw, 0px); }
 
 body {
   margin: 0;

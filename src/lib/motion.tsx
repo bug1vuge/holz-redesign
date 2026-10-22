@@ -85,7 +85,17 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       else if (target instanceof HTMLElement) target.scrollIntoView({ behavior: "smooth" });
     },
     lock: v => {
+      const was = locks.current;
       locks.current = Math.max(0, locks.current + (v ? 1 : -1));
+      // полоса прокрутки прячется, а её ширина возвращается отступом — страница не прокручивается и не «прыгает»
+      const root = document.documentElement;
+      if (was === 0 && locks.current > 0) {
+        root.style.setProperty("--sbw", `${Math.max(0, window.innerWidth - root.clientWidth)}px`);
+        root.classList.add("is-locked");
+      } else if (was > 0 && locks.current === 0) {
+        root.classList.remove("is-locked");
+        root.style.removeProperty("--sbw");
+      }
       const l = lenisRef.current;
       if (l) { if (locks.current > 0) l.stop(); else l.start(); }
     },
