@@ -59,6 +59,10 @@ img, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 input, textarea, select { font: inherit; color: inherit; }
+/* мигающая текстовая каретка только в полях ввода, а не на обычном тексте */
+html { caret-color: transparent; }
+input, textarea, [contenteditable="true"] { caret-color: var(--brass-2); }
+.dark input, .dark textarea { caret-color: var(--brass); }
 ::selection { background: var(--brass); color: var(--ink); }
 
 :focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
