@@ -1,3 +1,4 @@
+import { Select } from "./Select";
 import { createContext, useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { gsap, useScroll } from "../lib/motion";
@@ -70,10 +71,7 @@ export function LeadProvider({ children }: { children: ReactNode }) {
               <div className="lm__fields">
                 <label className="field" data-li><input required placeholder=" " name="name" /><label>Как к вам обращаться</label></label>
                 <label className="field" data-li><input required placeholder=" " name="phone" type="tel" inputMode="tel" pattern="[0-9+()\- ]{10,}" /><label>Телефон</label></label>
-                <label className="field" data-li>
-                  <select name="city" defaultValue="Москва">{CITIES.map(c => <option key={c}>{c}</option>)}</select>
-                  <label>Город</label>
-                </label>
+                <div data-li><Select name="city" label="Город" defaultValue="Москва" options={CITIES} /></div>
                 <label className="field" data-li><textarea placeholder=" " name="comment" /><label>Комментарий: количество проёмов, сроки</label></label>
               </div>
               <div className="lm__pref" data-li>

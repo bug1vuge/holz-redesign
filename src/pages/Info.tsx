@@ -1,3 +1,4 @@
+import { Select } from "../components/Select";
 import { useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { gsap, useGSAP, useReveal, Split, Counter, prefersReduced } from "../lib/motion";
@@ -379,7 +380,7 @@ export function Reviews() {
           <div><span className="eyebrow">Оставить отзыв</span><div className="h2">Расскажите о своих дверях</div></div>
           <div className="rev-form__fields">
             <label className="field"><input required placeholder=" " /><label>Имя</label></label>
-            <label className="field"><select defaultValue="Москва">{CITIES.map(c => <option key={c}>{c}</option>)}</select><label>Город</label></label>
+            <Select name="city" label="Город" defaultValue="Москва" options={CITIES} />
             <div className="rev-form__stars">{[1, 2, 3, 4, 5].map(n => <button type="button" key={n} onClick={() => setRating(n)} className={n <= rating ? "is-on" : ""} aria-label={`${n} из 5`}><Star width={26} height={26} /></button>)}</div>
             <label className="field"><textarea required placeholder=" " /><label>Ваш отзыв</label></label>
             <button className="btn btn--dark" type="submit">Отправить отзыв</button>

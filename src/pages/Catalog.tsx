@@ -1,4 +1,5 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Select } from "../components/Select";
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Flip } from "gsap/Flip";
 import { gsap, useReveal, prefersReduced, useScroll } from "../lib/motion";
@@ -168,8 +169,9 @@ function ProductList({ slug }: { slug: string }) {
       </div>
       <div className="flt__grp">
         <div className="flt__h">Цена до <b>{maxPrice ? rub(maxPrice) : "любая"}</b></div>
-        <input className="range" type="range" min={0} max={priceCap} step={1000} value={maxPrice || priceCap}
+        <input className="range" type="range" style={{ "--p": `${((maxPrice || priceCap) / priceCap) * 100}%` } as CSSProperties} min={0} max={priceCap} step={1000} value={maxPrice || priceCap}
           onChange={e => { const v = Number(e.target.value); change(() => setMaxPrice(v >= priceCap ? 0 : v)); }} />
+        <div className="range__scale"><span>0 ₽</span><span>{rub(priceCap)}</span></div>
       </div>
       <label className="toggle">
         <input type="checkbox" checked={stock} onChange={() => change(() => setStock(s => !s))} />
@@ -194,15 +196,15 @@ function ProductList({ slug }: { slug: string }) {
           <div className="cat-bar">
             <button className="chip cat-bar__flt" onClick={() => setDrawer(true)}><Filter width={16} height={16} />Фильтры{active ? ` · ${active}` : ""}</button>
             <span className="cat-bar__count"><b>{list.length}</b> {plural(list.length, "товар", "товара", "товаров")}</span>
-            <label className="cat-bar__sort">
+            <div className="cat-bar__sort">
               <span className="small muted">Сортировка:</span>
-              <select value={sort} onChange={e => change(() => setSort(e.target.value as Sort))}>
-                <option value="pop">по популярности</option>
-                <option value="asc">сначала дешевле</option>
-                <option value="desc">сначала дороже</option>
-                <option value="new">сначала новинки</option>
-              </select>
-            </label>
+              <Select variant="inline" value={sort} onChange={v => change(() => setSort(v as Sort))} options={[
+                { value: "pop", label: "по популярности" },
+                { value: "asc", label: "сначала дешевле" },
+                { value: "desc", label: "сначала дороже" },
+                { value: "new", label: "сначала новинки" },
+              ]} />
+            </div>
           </div>
           {list.length ? (
             <div className="pgrid" ref={grid}>

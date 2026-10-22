@@ -22,6 +22,7 @@ export const useScroll = () => useContext(ScrollCtx);
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
   const locks = useRef(0);
+  const lenisRef = useRef<Lenis | null>(null);
   useEffect(() => {
     if (prefersReduced()) return;
     const l = new Lenis({ lerp: 0.12, wheelMultiplier: 1, touchMultiplier: 1.2 });
@@ -29,12 +30,21 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     const tick = (time: number) => l.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
+    lenisRef.current = l;
     setLenis(l);
+    // если страница выросла после расчёта (шрифты, пины, «показать ещё»), Lenis не пускал колесом до самого низа:
+    // у конца страницы сверяем лимит с реальной высотой документа и пересчитываем его
+    const realLimit = () => document.documentElement.scrollHeight - window.innerHeight;
+    const nearEnd = (e: WheelEvent) => {
+      if (e.deltaY <= 0) return;
+      if (l.targetScroll >= l.limit - window.innerHeight && Math.abs(realLimit() - l.limit) > 1) l.resize();
+    };
+    window.addEventListener("wheel", nearEnd, { passive: true, capture: true });
     // высота страницы меняется (смена маршрута, «показать ещё», картинки) — пересчитываем лимиты
     let t = 0;
     const ro = new ResizeObserver(() => { clearTimeout(t); t = window.setTimeout(() => { l.resize(); ScrollTrigger.refresh(); }, 120); });
     ro.observe(document.body);
-    return () => { ro.disconnect(); gsap.ticker.remove(tick); l.destroy(); };
+    return () => { window.removeEventListener("wheel", nearEnd, { capture: true }); ro.disconnect(); gsap.ticker.remove(tick); l.destroy(); lenisRef.current = null; };
   }, []);
 
   // блокировка скролла без скрытия полосы прокрутки — страница не «прыгает» по ширине
@@ -76,7 +86,8 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     },
     lock: v => {
       locks.current = Math.max(0, locks.current + (v ? 1 : -1));
-      if (lenis) { if (locks.current > 0) lenis.stop(); else lenis.start(); }
+      const l = lenisRef.current;
+      if (l) { if (locks.current > 0) l.stop(); else l.start(); }
     },
   };
   return <ScrollCtx.Provider value={api}>{children}</ScrollCtx.Provider>;

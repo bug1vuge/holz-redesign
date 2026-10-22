@@ -1,0 +1,61 @@
+/* ---------- выпадающий список ---------- */
+.sel {
+  position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; text-align: left; cursor: pointer; color: inherit;
+}
+.sel__val { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sel__arrow { width: 12px; height: 12px; flex-shrink: 0; opacity: .6; transition: transform .35s var(--ease), opacity .3s; }
+.sel:hover .sel__arrow { opacity: 1; }
+.sel.is-open .sel__arrow { transform: rotate(180deg); opacity: 1; }
+
+/* как поле формы */
+.field--sel .sel {
+  height: 58px; padding: 22px 0 6px; border-bottom: 1px solid var(--line); font-size: 16px; transition: border-color .3s;
+}
+.field--sel .sel:hover, .field--sel .sel.is-open, .field--sel .sel:focus-visible { border-color: var(--brass-2); }
+.field--sel .sel:focus-visible { outline: none; }
+.field--sel .sel__arrow { margin-top: -16px; }
+.field--sel .field__lbl { position: absolute; left: 0; top: 2px; font-size: 12px; letter-spacing: .04em; color: var(--muted); pointer-events: none; }
+.dark .field--sel .sel { border-color: var(--line-d); }
+.dark .field--sel .sel:hover, .dark .field--sel .sel.is-open { border-color: var(--brass); }
+.dark .field--sel .field__lbl { color: var(--muted-d); }
+
+/* компактный — в строке сортировки */
+.sel-inline { display: inline-flex; }
+.sel-inline .sel { width: auto; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: 100px; font-size: 14px; font-weight: 600; transition: border-color .3s; }
+.sel-inline .sel:hover, .sel-inline .sel.is-open { border-color: var(--text); }
+
+/* всплывающий список */
+.sel-pop {
+  position: fixed; z-index: 400; margin: 0; padding: 6px; list-style: none;
+  background: var(--paper); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 24px 48px rgba(18, 16, 14, .18), 0 2px 6px rgba(18, 16, 14, .06);
+  overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--paper-3) transparent;
+  transform-origin: top center; animation: selIn .28s var(--ease);
+}
+.sel-pop.is-up { transform-origin: bottom center; }
+.sel-pop::-webkit-scrollbar { width: 6px; }
+.sel-pop::-webkit-scrollbar-thumb { background: var(--paper-3); border-radius: 6px; }
+.sel-pop::-webkit-scrollbar-track { background: transparent; }
+@keyframes selIn { from { opacity: 0; transform: translateY(-6px) scaleY(.96); } to { opacity: 1; transform: none; } }
+.sel-pop.is-up { animation-name: selInUp; }
+@keyframes selInUp { from { opacity: 0; transform: translateY(6px) scaleY(.96); } to { opacity: 1; transform: none; } }
+
+.sel-pop__opt {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 42px; padding: 0 12px; border-radius: 5px; font-size: 15px; cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.sel-pop__opt span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sel-pop__opt svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--brass-2); }
+.sel-pop__opt.is-active { background: var(--paper-2); }
+.sel-pop__opt.is-on { font-weight: 600; }
+
+.sel-pop--dark { background: var(--ink-2); color: var(--paper); border-color: var(--line-d); box-shadow: 0 24px 48px rgba(0, 0, 0, .5); scrollbar-color: var(--ink-3) transparent; }
+.sel-pop--dark::-webkit-scrollbar-thumb { background: var(--ink-3); }
+.sel-pop--dark .sel-pop__opt.is-active { background: var(--ink-3); }
+.sel-pop--dark .sel-pop__opt svg { color: var(--brass); }
+
+@media (hover: none) {
+  .sel-pop__opt { min-height: 46px; }
+}

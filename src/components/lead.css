@@ -17,10 +17,13 @@
 .lm__ctx-title { font-family: var(--serif); font-size: 22px; color: var(--brass-3); line-height: 1.2; }
 .lm__ctx-row { font-size: 12px; color: var(--muted-d); }
 .lm__fields { display: grid; gap: 0; }
-.lm__fields .field input, .lm__fields .field select { height: clamp(48px, 6.4vh, 58px); }
+.lm__fields .field input, .lm__fields .field .sel { height: clamp(48px, 6.4vh, 58px); }
 .lm__fields .field textarea { height: clamp(56px, 8.5vh, 90px); }
 .lm__pref { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.lm__radio input { position: absolute; opacity: 0; pointer-events: none; }
+.lm__radio { position: relative; }
+.lm__radio input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.lm__radio span:hover { border-color: var(--brass); }
+.lm__radio input:focus-visible + span { box-shadow: 0 0 0 3px rgba(201, 163, 104, .45); }
 .lm__radio span { display: inline-flex; height: 32px; align-items: center; padding: 0 13px; border-radius: 100px; border: 1px solid var(--line-d); font-size: 13px; cursor: pointer; transition: all .3s; }
 .lm__radio input:checked + span { background: var(--brass); color: var(--ink); border-color: var(--brass); }
 .lm__form .btn { width: 100%; height: clamp(48px, 6.4vh, 56px); }
