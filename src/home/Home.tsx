@@ -56,7 +56,7 @@ function Portal({ ready }: { ready: boolean }) {
     const q = gsap.utils.selector(root);
     if (prefersReduced()) return;
     const tl = gsap.timeline({
-      scrollTrigger: { trigger: root.current, start: "top top", end: "+=260%", scrub: 1, pin: true, anticipatePin: 1 },
+      scrollTrigger: { trigger: root.current, start: "top top", end: "+=190%", scrub: 0.6, pin: true, anticipatePin: 1 },
     });
     tl.to(q(".portal__leaf"), { rotateY: -112, ease: "power2.inOut", duration: 1 }, 0)
       .to(q(".portal__glow"), { opacity: 1, duration: 0.8 }, 0.05)
@@ -77,10 +77,10 @@ function Portal({ ready }: { ready: boolean }) {
     const q = gsap.utils.selector(root);
     if (!ready || prefersReduced()) return;
     gsap.timeline({ delay: 0.15 })
-      .fromTo(q(".portal__frame"), { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 1.6, ease: "expo.inOut" })
-      .fromTo(q(".portal__char"), { yPercent: 110 }, { yPercent: 0, duration: 1.3, stagger: 0.035, ease: "expo.out" }, 0.5)
-      .fromTo(q(".portal__intro"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "expo.out" }, 1.1)
-      .fromTo(q(".portal__leaf"), { rotateY: 0 }, { rotateY: -9, duration: 1.2, ease: "power3.inOut", yoyo: true, repeat: 1 }, 1.4);
+      .fromTo(q(".portal__frame"), { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 1.2, ease: "expo.inOut" })
+      .fromTo(q(".portal__char"), { yPercent: 110 }, { yPercent: 0, duration: 1, stagger: 0.025, ease: "expo.out" }, 0.35)
+      .fromTo(q(".portal__intro"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1, stagger: 0.08, ease: "expo.out" }, 0.8)
+      .fromTo(q(".portal__leaf"), { rotateY: 0 }, { rotateY: -9, duration: 0.9, ease: "power3.inOut", yoyo: true, repeat: 1 }, 1);
     ScrollTrigger.refresh();
   }, { scope: root, dependencies: [ready] });
 
@@ -133,7 +133,7 @@ function Anatomy() {
     const mm = gsap.matchMedia();
     mm.add({ big: "(min-width: 900px)", small: "(max-width: 899px)" }, ctx => {
       const gap = ctx.conditions?.big ? 90 : 55;
-      const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=320%", scrub: 1, pin: true } });
+      const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=240%", scrub: 0.6, pin: true } });
       tl.fromTo(q(".anat__stack"), { rotateX: 0, rotateZ: 0, scale: 0.9 }, { rotateX: 58, rotateZ: -36, scale: 1, duration: 1, ease: "power2.inOut" })
         .to(q(".anat__intro"), { opacity: 0, y: -30, duration: 0.5 }, 0.2);
       q(".anat__layer").forEach((l, i) => tl.to(l, { z: i * gap, duration: 1, ease: "power2.out" }, 0.6));
@@ -196,7 +196,7 @@ function Finishes() {
     gsap.set(groups.slice(1), { opacity: 0, y: 10 });
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: root.current, start: "top top", end: `+=${SHOW.length * 90}%`, scrub: 1, pin: true,
+        trigger: root.current, start: "top top", end: `+=${SHOW.length * 62}%`, scrub: 0.6, pin: true,
         onUpdate: s => setIdx(Math.min(SHOW.length - 1, Math.round(s.progress * (SHOW.length - 1)))),
       },
     });
@@ -259,9 +259,9 @@ function Collections() {
     const dist = () => track.scrollWidth - window.innerWidth;
     const tween = gsap.to(track, {
       x: () => -dist(), ease: "none",
-      scrollTrigger: { trigger: root.current, start: "top top", end: () => "+=" + dist(), pin: true, scrub: 1, invalidateOnRefresh: true },
+      scrollTrigger: { trigger: root.current, start: "top top", end: () => "+=" + dist() * 0.85, pin: true, scrub: 0.6, invalidateOnRefresh: true },
     });
-    gsap.to(q(".coll__bg"), { xPercent: -35, ease: "none", scrollTrigger: { trigger: root.current, start: "top top", end: () => "+=" + dist(), scrub: 1 } });
+    gsap.to(q(".coll__bg"), { xPercent: -35, ease: "none", scrollTrigger: { trigger: root.current, start: "top top", end: () => "+=" + dist() * 0.85, scrub: 0.6 } });
     q(".coll__door").forEach(d => gsap.fromTo(d, { xPercent: 22, rotateY: 18 }, {
       xPercent: -22, rotateY: -18, ease: "none",
       scrollTrigger: { trigger: d, containerAnimation: tween, start: "left right", end: "right left", scrub: true },
@@ -312,7 +312,7 @@ function Illusion() {
     const len = 2 * (seam.width.baseVal.value + seam.height.baseVal.value);
     gsap.set(seam, { strokeDasharray: len, strokeDashoffset: len });
     gsap.set(q(".ill__line"), { opacity: 0, y: 20 });
-    const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=300%", scrub: 1, pin: true } });
+    const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=220%", scrub: 0.6, pin: true } });
     tl.to(seam, { strokeDashoffset: 0, duration: 1, ease: "none" }, 0)
       .to(q(".ill__line")[0], { opacity: 1, y: 0, duration: 0.3 }, 0.2)
       .to(q(".ill__handle"), { opacity: 1, scale: 1, duration: 0.3 }, 0.9)
@@ -364,7 +364,7 @@ function Height() {
     const q = gsap.utils.selector(root);
     if (prefersReduced()) { if (num.current) num.current.textContent = "3000"; return; }
     const o = { h: 2000 };
-    const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=220%", scrub: 1, pin: true } });
+    const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=160%", scrub: 0.6, pin: true } });
     tl.fromTo(q(".hgt__door"), { height: "66.66%" }, { height: "100%", ease: "power1.inOut", duration: 1 }, 0)
       .to(o, { h: 3000, duration: 1, ease: "power1.inOut", onUpdate: () => { if (num.current) num.current.textContent = String(Math.round(o.h / 10) * 10); } }, 0)
       .fromTo(q(".hgt__tag"), { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.15 }, 0.38)
@@ -440,7 +440,7 @@ function Network() {
     if (prefersReduced()) return;
     const paths = q(".net__arc") as unknown as SVGPathElement[];
     paths.forEach(p => { const l = p.getTotalLength(); gsap.set(p, { strokeDasharray: l, strokeDashoffset: l }); });
-    const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=160%", scrub: 1, pin: true } });
+    const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=120%", scrub: 0.6, pin: true } });
     tl.fromTo(q(".net__factory"), { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(3)" }, 0)
       .to(paths, { strokeDashoffset: 0, duration: 1, stagger: 0.05, ease: "power1.inOut" }, 0.2)
       .fromTo(q(".net__city"), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, stagger: 0.05, ease: "back.out(3)" }, 0.5)

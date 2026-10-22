@@ -60,15 +60,19 @@
 
 /* выбор города */
 .city { position: fixed; inset: 0; z-index: 210; display: grid; place-items: center; padding: 16px; }
-.city__veil { position: absolute; inset: 0; background: rgba(10, 9, 8, .55); backdrop-filter: blur(6px); }
-.city__box { position: relative; width: min(560px, 100%); max-height: 80vh; overflow: auto; background: var(--paper); color: var(--text); border-radius: 8px; padding: 40px; display: flex; flex-direction: column; gap: 12px; }
-.city__close { border-color: var(--line); top: 16px; right: 16px; }
-.city__search { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); padding: 12px 0; }
-.city__search input { flex: 1; border: 0; outline: none; background: transparent; font-size: 17px; }
-.city__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px; }
-.city__opt { text-align: left; padding: 10px 12px; border-radius: 4px; font-size: 15px; transition: background .2s; }
+.city__veil { position: absolute; inset: 0; background: rgba(10, 9, 8, .55); }
+.city__box { position: relative; width: min(600px, 100%); height: min(560px, calc(100vh - 32px)); background: var(--paper); color: var(--text); border-radius: 10px; padding: clamp(24px, 4vw, 40px); display: flex; flex-direction: column; gap: 10px; overflow: hidden; box-shadow: 0 40px 80px rgba(0, 0, 0, .35); }
+.city__box .small { margin: 0; }
+.city__close { border-color: var(--line); top: 16px; right: 16px; color: var(--text); }
+.city__search { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); padding: 10px 0; margin-bottom: 6px; flex-shrink: 0; }
+.city__search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font-size: 16px; }
+.city__list { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 44px; align-content: start; gap: 2px 6px; overscroll-behavior: contain; }
+.city__list::-webkit-scrollbar { display: none; }
+.city__list > p { grid-column: 1 / -1; }
+.city__opt { text-align: left; padding: 0 12px; border-radius: 6px; font-size: 15px; transition: background .2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .city__opt:hover { background: var(--paper-2); }
 .city__opt.is-on { background: var(--ink); color: var(--paper); }
+@media (max-width: 520px) { .city__list { grid-template-columns: repeat(2, 1fr); } }
 
 @media (max-width: 1180px) {
   .hdr__nav, .hdr__phone { display: none; }

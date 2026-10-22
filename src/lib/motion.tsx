@@ -21,24 +21,63 @@ export const useScroll = () => useContext(ScrollCtx);
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
+  const locks = useRef(0);
   useEffect(() => {
     if (prefersReduced()) return;
-    const l = new Lenis({ duration: 1.15, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)), wheelMultiplier: 0.9, touchMultiplier: 1.4 });
+    const l = new Lenis({ lerp: 0.12, wheelMultiplier: 1, touchMultiplier: 1.2 });
     l.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => l.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
     setLenis(l);
-    return () => { gsap.ticker.remove(tick); l.destroy(); };
+    // высота страницы меняется (смена маршрута, «показать ещё», картинки) — пересчитываем лимиты
+    let t = 0;
+    const ro = new ResizeObserver(() => { clearTimeout(t); t = window.setTimeout(() => { l.resize(); ScrollTrigger.refresh(); }, 120); });
+    ro.observe(document.body);
+    return () => { ro.disconnect(); gsap.ticker.remove(tick); l.destroy(); };
   }, []);
+
+  // блокировка скролла без скрытия полосы прокрутки — страница не «прыгает» по ширине
+  useEffect(() => {
+    // прокрутка разрешена только внутри элемента, который действительно может прокрутиться в эту сторону
+    const canScroll = (e: Event) => {
+      let el = (e.target as HTMLElement | null)?.closest?.("[data-scroll-allow]") as HTMLElement | null;
+      while (el) {
+        const dy = e instanceof WheelEvent ? e.deltaY : 0;
+        const room = el.scrollHeight - el.clientHeight;
+        if (room > 1) {
+          if (!(e instanceof WheelEvent)) return true;
+          if (dy > 0 && el.scrollTop < room - 1) return true;
+          if (dy < 0 && el.scrollTop > 0) return true;
+        }
+        el = el.parentElement?.closest("[data-scroll-allow]") as HTMLElement | null;
+      }
+      return false;
+    };
+    const block = (e: Event) => { if (locks.current > 0 && !canScroll(e)) e.preventDefault(); };
+    const keys = (e: KeyboardEvent) => {
+      if (locks.current === 0) return;
+      const tag = (e.target as HTMLElement).tagName;
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(tag)) return;
+      if ([" ", "PageDown", "PageUp", "End", "Home", "ArrowDown", "ArrowUp"].includes(e.key)) e.preventDefault();
+    };
+    window.addEventListener("wheel", block, { passive: false });
+    window.addEventListener("touchmove", block, { passive: false });
+    window.addEventListener("keydown", keys);
+    return () => { window.removeEventListener("wheel", block); window.removeEventListener("touchmove", block); window.removeEventListener("keydown", keys); };
+  }, []);
+
   const api: ScrollApi = {
     lenis,
     to: (target, opts) => {
-      if (lenis) lenis.scrollTo(target as never, { immediate: opts?.immediate, offset: opts?.offset ?? 0, force: true });
+      if (lenis) lenis.scrollTo(target as never, { immediate: opts?.immediate, offset: opts?.offset ?? 0, force: true, duration: opts?.immediate ? undefined : 1.2 });
       else if (typeof target === "number") window.scrollTo({ top: target, behavior: opts?.immediate ? "auto" : "smooth" });
       else if (target instanceof HTMLElement) target.scrollIntoView({ behavior: "smooth" });
     },
-    lock: v => { if (lenis) { v ? lenis.stop() : lenis.start(); } document.documentElement.style.overflow = v ? "hidden" : ""; },
+    lock: v => {
+      locks.current = Math.max(0, locks.current + (v ? 1 : -1));
+      if (lenis) { if (locks.current > 0) lenis.stop(); else lenis.start(); }
+    },
   };
   return <ScrollCtx.Provider value={api}>{children}</ScrollCtx.Provider>;
 }
@@ -52,7 +91,7 @@ export function Split({ text, as: Tag = "h2", className, delay = 0, immediate = 
     if (!ref.current || prefersReduced()) return;
     const words = ref.current.querySelectorAll(".split-line > span");
     gsap.fromTo(words, { yPercent: 115, rotate: 4 }, {
-      yPercent: 0, rotate: 0, duration: 1.15, ease: "expo.out", stagger: 0.06, delay,
+      yPercent: 0, rotate: 0, duration: 0.9, ease: "expo.out", stagger: 0.045, delay,
       scrollTrigger: immediate ? undefined : { trigger: ref.current, start: "top 88%" },
     });
   }, { scope: ref });
@@ -82,7 +121,7 @@ export function useReveal<T extends HTMLElement>() {
     if (prefersReduced()) { gsap.set(items, { opacity: 1, y: 0 }); return; }
     items.forEach(el => {
       gsap.fromTo(el, { opacity: 0, y: 46 }, {
-        opacity: 1, y: 0, duration: 1.1, ease: "expo.out", delay: Number(el.dataset.delay ?? 0),
+        opacity: 1, y: 0, duration: 0.85, ease: "expo.out", delay: Number(el.dataset.delay ?? 0) * 0.8,
         scrollTrigger: { trigger: el, start: "top 92%" },
       });
     });

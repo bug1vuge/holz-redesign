@@ -138,7 +138,7 @@ export function Header() {
         </div>
       </header>
 
-      <div className="mob dark" ref={mobRef} style={{ display: "none" }}>
+      <div className="mob dark" ref={mobRef} style={{ display: "none" }} data-scroll-allow data-lenis-prevent>
         <nav className="mob__nav">
           {[{ label: "Каталог", to: "/katalog" }, ...NAV.slice(1)].map(n => (
             <span key={n.to} className="split-line"><Link className="mob__link" to={n.to}>{n.label}</Link></span>
@@ -159,6 +159,8 @@ export function Header() {
 function CityModal({ current, onPick, onClose }: { current: string; onPick: (c: string) => void; onClose: () => void }) {
   const [q, setQ] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  const { lock } = useScroll();
+  useEffect(() => { lock(true); return () => lock(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (ref.current) gsap.fromTo(ref.current.querySelector(".city__box"), { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "expo.out" });
     const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -174,7 +176,7 @@ function CityModal({ current, onPick, onClose }: { current: string; onPick: (c: 
         <div className="h3">Ваш город</div>
         <p className="small muted">Покажем ближайшие салоны и наличие.</p>
         <label className="city__search"><Search /><input autoFocus placeholder="Начните вводить город" value={q} onChange={e => setQ(e.target.value)} /></label>
-        <div className="city__list">
+        <div className="city__list" data-scroll-allow data-lenis-prevent>
           {list.map(c => <button key={c} className={"city__opt" + (c === current ? " is-on" : "")} onClick={() => onPick(c)}>{c}</button>)}
           {!list.length && <p className="muted small">Салона в этом городе пока нет — оставьте заявку, доставим двери из ближайшего салона.</p>}
         </div>

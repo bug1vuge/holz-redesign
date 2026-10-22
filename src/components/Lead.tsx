@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, type FormEvent,
 import { Link } from "react-router-dom";
 import { gsap, useScroll } from "../lib/motion";
 import { CITIES } from "../data/content";
-import { Check, Close } from "./Icons";
+import { Close } from "./Icons";
 import "./lead.css";
 
 export interface LeadContext { title: string; details?: string[] }
@@ -54,7 +54,7 @@ export function LeadProvider({ children }: { children: ReactNode }) {
       {children}
       <div className="lm" ref={root} style={{ visibility: "hidden" }} aria-hidden={!open} role="dialog" aria-modal="true" aria-label="Заявка">
         <div className="lm__veil" onClick={() => setOpen(false)} />
-        <div className="lm__panel dark">
+        <div className="lm__panel dark" data-scroll-allow data-lenis-prevent>
           <button className="lm__close" onClick={() => setOpen(false)} aria-label="Закрыть"><Close /></button>
           {!sent ? (
             <form onSubmit={submit} className="lm__form">
@@ -89,7 +89,7 @@ export function LeadProvider({ children }: { children: ReactNode }) {
             <div className="lm__success">
               <svg className="lm__check" viewBox="0 0 80 80"><circle cx="40" cy="40" r="38" fill="none" stroke="currentColor" strokeOpacity=".2" /><path d="M24 41l11 11 22-24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" /></svg>
               <h3 className="h2">Заявка принята</h3>
-              <p className="lm">Это демо-версия: в рабочем сайте заявка уйдёт в CRM, а менеджер получит название модели и выбранную конфигурацию.</p>
+              <p className="lead">Это демо-версия: в рабочем сайте заявка уйдёт в CRM, а менеджер получит название модели и выбранную конфигурацию.</p>
               <button className="btn btn--ghost" onClick={() => setOpen(false)}>Вернуться к сайту</button>
             </div>
           )}
@@ -108,11 +108,10 @@ export function Messengers() {
         <a href="#" onClick={e => e.preventDefault()} className="msgr__item" style={{ ["--i" as string]: 1 }}>WhatsApp</a>
         <a href="#" onClick={e => e.preventDefault()} className="msgr__item" style={{ ["--i" as string]: 0 }}>MAX</a>
       </div>
-      <button className="msgr__btn" onClick={() => setOpen(o => !o)} aria-label="Написать в мессенджер" data-cursor="Написать">
+      <button className="msgr__btn" onClick={() => setOpen(o => !o)} aria-label="Написать в мессенджер">
         <span className="msgr__pulse" />
         {open ? <Close /> : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M20 12a8 8 0 0 1-11.7 7.1L4 20l1-4A8 8 0 1 1 20 12Z" /></svg>}
       </button>
-      <span className="sr-only"><Check /></span>
-    </div>
+          </div>
   );
 }

@@ -41,7 +41,6 @@
 html { -webkit-text-size-adjust: 100%; }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
-.lenis.lenis-stopped { overflow: hidden; }
 
 body {
   margin: 0;
@@ -158,7 +157,7 @@ input, textarea, select { font: inherit; color: inherit; }
 .no-js .reveal, .reduced .reveal { opacity: 1; transform: none; }
 
 /* ---------- секции внутренних страниц ---------- */
-.page { padding-top: var(--header-h); min-height: 100vh; }
+.page { padding-top: var(--header-h); min-height: 100vh; overflow-x: clip; }
 .section { padding: clamp(64px, 9vw, 140px) 0; }
 .section--tight { padding: clamp(40px, 6vw, 90px) 0; }
 .dark { background: var(--ink); color: var(--paper); }

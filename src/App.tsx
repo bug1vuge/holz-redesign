@@ -4,7 +4,7 @@ import { ScrollTrigger, SmoothScroll, useScroll } from "./lib/motion";
 import { TextureDefs } from "./components/Door";
 import { Header } from "./components/Header";
 import { LeadProvider, Messengers } from "./components/Lead";
-import { Cursor, Curtain, Footer, Preloader, useRouteCurtain } from "./components/Chrome";
+import { CookieBar, Cursor, Curtain, Footer, Preloader, useRouteCurtain } from "./components/Chrome";
 import Home from "./home/Home";
 import { CatalogIndex, CategoryPage } from "./pages/Catalog";
 import ProductPage from "./pages/Product";
@@ -54,6 +54,7 @@ function Shell() {
       </Routes>
       <Footer />
       <Messengers />
+      <CookieBar />
       <Curtain />
     </>
   );

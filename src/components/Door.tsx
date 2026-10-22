@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from "react";
+import { getTextures } from "./textures";
 import { EDGES, finishById, type DoorKind, type Edge, type Finish, type Product } from "../data/catalog";
 
 /* ---------- цветовые утилиты ---------- */
@@ -23,22 +24,6 @@ export function TextureDefs() {
   return (
     <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
       <defs>
-        <filter id="tx-wood" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.32 0.007" numOctaves="3" seed="7" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.35" />
-        </filter>
-        <filter id="tx-wood-light" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.9 0.012" numOctaves="2" seed="3" />
-          <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -2.6 1.45" />
-        </filter>
-        <filter id="tx-stone" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="5" seed="11" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.8 1.1" />
-        </filter>
-        <filter id="tx-vein" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="turbulence" baseFrequency="0.012 0.02" numOctaves="3" seed="4" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -9 1.25" />
-        </filter>
         <linearGradient id="g-light" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0" stopColor="#fff" stopOpacity=".16" />
           <stop offset=".45" stopColor="#fff" stopOpacity="0" />
@@ -142,14 +127,14 @@ function Surface({ b, finish, id, r = 0 }: { b: Box; finish: Finish; id: string;
       <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={r} fill={finish.color} />
       {finish.texture === "wood" && (
         <g clipPath={`url(#${id}-leaf)`}>
-          <rect x={b.x} y={b.y} width={b.w} height={b.h} filter="url(#tx-wood)" opacity=".42" />
-          <rect x={b.x} y={b.y} width={b.w} height={b.h} filter="url(#tx-wood-light)" opacity=".18" />
+          <image href={getTextures().wood} x={b.x} y={b.y} width={b.w} height={b.h} preserveAspectRatio="none" opacity=".42" />
+          <image href={getTextures().woodLight} x={b.x} y={b.y} width={b.w} height={b.h} preserveAspectRatio="none" opacity=".2" />
         </g>
       )}
       {finish.texture === "stone" && (
         <g clipPath={`url(#${id}-leaf)`}>
-          <rect x={b.x} y={b.y} width={b.w} height={b.h} filter="url(#tx-stone)" opacity=".38" />
-          <rect x={b.x} y={b.y} width={b.w} height={b.h} filter="url(#tx-vein)" opacity=".28" />
+          <image href={getTextures().stone} x={b.x} y={b.y} width={b.w} height={b.h} preserveAspectRatio="xMidYMid slice" opacity=".42" />
+          <image href={getTextures().vein} x={b.x} y={b.y} width={b.w} height={b.h} preserveAspectRatio="xMidYMid slice" opacity=".35" />
         </g>
       )}
       {finish.texture === "enamel" && <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={r} fill="url(#g-gloss)" />}
@@ -385,7 +370,8 @@ function Slats({ f, v, id, className, title }: SP) {
   for (let x = 2; x < W; x += sw + gap) bars.push(
     <g key={x}>
       <rect x={x} y="0" width={sw} height={H} fill={f.color} />
-      <rect x={x} y="0" width={sw} height={H} filter="url(#tx-wood)" opacity=".38" />
+      <image href={getTextures().wood} x={x} y="0" width={sw * 3} height={H} preserveAspectRatio="none" opacity=".38" clipPath={`url(#${id}-s${x})`} />
+      <clipPath id={`${id}-s${x}`}><rect x={x} y="0" width={sw} height={H} /></clipPath>
       <rect x={x} y="0" width={sw * 0.35} height={H} fill="#fff" opacity=".08" />
       <rect x={x + sw - 1} y="0" width="1" height={H} fill="#000" opacity=".25" />
     </g>);

@@ -1,7 +1,8 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Flip } from "gsap/Flip";
-import { gsap, useReveal, prefersReduced } from "../lib/motion";
+import { gsap, useReveal, prefersReduced, useScroll } from "../lib/motion";
+import { useEffect } from "react";
 import {
   CATEGORIES, categoryBySlug, FINISHES, FINISH_GROUPS, finishById, productsIn, rub,
   GLASS, PATINA, HARDWARE, MOULDINGS, DECOR, type FinishGroup,
@@ -91,6 +92,8 @@ function ProductList({ slug }: { slug: string }) {
   const [shown, setShown] = useState(PER);
   const [drawer, setDrawer] = useState(false);
   const grid = useRef<HTMLDivElement>(null);
+  const { lock } = useScroll();
+  useEffect(() => { if (!drawer) return; lock(true); return () => lock(false); }, [drawer]); // eslint-disable-line react-hooks/exhaustive-deps
   const flip = useRef<Flip.FlipState | null>(null);
 
   const collections = useMemo(() => Array.from(new Set(all.map(p => p.collection))), [all]);
@@ -182,7 +185,7 @@ function ProductList({ slug }: { slug: string }) {
         title={category.name} lead={category.description}
         aside={<div className="cat-aside"><Door kind={category.kind} finish={category.finish} edge={category.kind === "inlay" ? "gold" : "none"} glass={category.kind === "aluframe" || category.kind === "pivot" ? "clear" : undefined} /></div>} />
       <div className="container cat-layout">
-        <aside className={"cat-side" + (drawer ? " is-open" : "")}>
+        <aside className={"cat-side" + (drawer ? " is-open" : "")} data-scroll-allow data-lenis-prevent={drawer || undefined}>
           <div className="cat-side__head"><span className="h3">Фильтры</span><button onClick={() => setDrawer(false)} aria-label="Закрыть"><Close /></button></div>
           {filters}
           <button className="btn btn--dark cat-side__apply" onClick={() => setDrawer(false)}>Показать {list.length}</button>

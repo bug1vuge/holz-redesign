@@ -59,31 +59,76 @@ export function Footer() {
 export function Cursor() {
   const dot = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
-  const [label, setLabel] = useState("");
+  const [st, setSt] = useState({ vis: false, hover: false, text: false, down: false, label: "" });
   useEffect(() => {
-    if (window.matchMedia("(hover: none)").matches || prefersReduced()) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches || prefersReduced()) return;
     document.documentElement.classList.add("has-cursor");
     const dx = gsap.quickTo(dot.current, "x", { duration: 0.12 }), dy = gsap.quickTo(dot.current, "y", { duration: 0.12 });
-    const rx = gsap.quickTo(ring.current, "x", { duration: 0.5, ease: "power3" }), ry = gsap.quickTo(ring.current, "y", { duration: 0.5, ease: "power3" });
-    const move = (e: MouseEvent) => { dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY); };
-    const over = (e: MouseEvent) => {
-      const t = (e.target as HTMLElement).closest("a, button, [data-cursor], input, select, textarea, label") as HTMLElement | null;
-      ring.current?.classList.toggle("is-hover", !!t);
-      setLabel(t?.dataset.cursor ?? "");
+    const rx = gsap.quickTo(ring.current, "x", { duration: 0.45, ease: "power3" }), ry = gsap.quickTo(ring.current, "y", { duration: 0.45, ease: "power3" });
+    let first = true;
+    const move = (e: MouseEvent) => {
+      if (first) { first = false; gsap.set([dot.current, ring.current], { x: e.clientX, y: e.clientY }); }
+      dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY);
+      setSt(p => p.vis ? p : { ...p, vis: true });
     };
-    const down = () => ring.current?.classList.add("is-down");
-    const up = () => ring.current?.classList.remove("is-down");
+    const over = (e: MouseEvent) => {
+      const el = e.target as HTMLElement;
+      const text = !!el.closest("input, textarea, select, [contenteditable]");
+      const t = el.closest("a, button, [data-cursor], label") as HTMLElement | null;
+      const label = !text && t?.dataset.cursor ? t.dataset.cursor : "";
+      const hover = !!t && !text;
+      setSt(p => (p.text === text && p.hover === hover && p.label === label) ? p : { ...p, text, hover, label });
+    };
+    const leave = () => setSt(p => ({ ...p, vis: false }));
+    const enter = () => setSt(p => ({ ...p, vis: true }));
+    const down = () => setSt(p => ({ ...p, down: true }));
+    const up = () => setSt(p => ({ ...p, down: false }));
     window.addEventListener("mousemove", move);
     window.addEventListener("mouseover", over);
     window.addEventListener("mousedown", down);
     window.addEventListener("mouseup", up);
-    return () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseover", over); window.removeEventListener("mousedown", down); window.removeEventListener("mouseup", up); };
+    document.documentElement.addEventListener("mouseleave", leave);
+    document.documentElement.addEventListener("mouseenter", enter);
+    return () => {
+      window.removeEventListener("mousemove", move); window.removeEventListener("mouseover", over);
+      window.removeEventListener("mousedown", down); window.removeEventListener("mouseup", up);
+      document.documentElement.removeEventListener("mouseleave", leave); document.documentElement.removeEventListener("mouseenter", enter);
+    };
   }, []);
+  const cls = (base: string) => [base, !st.vis && "is-out", st.text && "is-text", st.hover && "is-hover", st.down && "is-down", st.label && "has-label"].filter(Boolean).join(" ");
   return (
     <>
-      <div className="cur-dot" ref={dot} />
-      <div className={"cur-ring" + (label ? " has-label" : "")} ref={ring}><span>{label}</span></div>
+      <div className={cls("cur-dot")} ref={dot} />
+      <div className={cls("cur-ring")} ref={ring}><span>{st.label}</span></div>
     </>
+  );
+}
+
+/* ---------- плашка cookie ---------- */
+export function CookieBar() {
+  const [show, setShow] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let ok = false;
+    try { ok = localStorage.getItem("holz-cookie") === "1"; } catch { /* приватный режим */ }
+    if (ok) return;
+    const t = setTimeout(() => setShow(true), 3200);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
+    if (show && ref.current && !prefersReduced()) gsap.fromTo(ref.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: "expo.out" });
+  }, [show]);
+  const accept = () => {
+    try { localStorage.setItem("holz-cookie", "1"); } catch { /* приватный режим */ }
+    if (ref.current) gsap.to(ref.current, { y: 30, opacity: 0, duration: 0.4, ease: "power2.in", onComplete: () => setShow(false) });
+    else setShow(false);
+  };
+  if (!show) return null;
+  return (
+    <div className="cookie" ref={ref} role="dialog" aria-label="Использование cookie">
+      <p>Мы используем <Link to="/politika" className="link-u">файлы cookie</Link> и системы аналитики для улучшения работы сайта.</p>
+      <button className="btn btn--brass btn--sm" onClick={accept}>Принять</button>
+    </div>
   );
 }
 
@@ -99,14 +144,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     const len = path.getTotalLength?.() ?? 400;
     gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
     const tl = gsap.timeline({ onComplete: () => { el.style.display = "none"; } });
-    tl.to(o, { v: 100, duration: 1.6, ease: "power2.inOut", onUpdate: () => { num.textContent = String(Math.round(o.v)).padStart(3, "0"); } })
-      .to(path, { strokeDashoffset: 0, duration: 1.6, ease: "power2.inOut" }, 0)
+    tl.to(o, { v: 100, duration: 1.1, ease: "power2.inOut", onUpdate: () => { num.textContent = String(Math.round(o.v)).padStart(3, "0"); } })
+      .to(path, { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut" }, 0)
       .fromTo(".pre__word span", { yPercent: 110 }, { yPercent: 0, stagger: 0.06, duration: 0.9, ease: "expo.out" }, 0.2)
-      .to(".pre__leaf", { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, 1.4)
-      .add(() => onDone(), 1.9)
-      .to(".pre__panel--l", { xPercent: -100, duration: 1.1, ease: "expo.inOut" }, 2)
-      .to(".pre__panel--r", { xPercent: 100, duration: 1.1, ease: "expo.inOut" }, 2)
-      .to(".pre__center", { opacity: 0, scale: 0.9, duration: 0.5 }, 1.95);
+      .to(".pre__leaf", { scaleX: 1, duration: 0.4, ease: "power3.inOut" }, 0.95)
+      .add(() => onDone(), 1.35)
+      .to(".pre__panel--l", { xPercent: -100, duration: 0.9, ease: "expo.inOut" }, 1.4)
+      .to(".pre__panel--r", { xPercent: 100, duration: 0.9, ease: "expo.inOut" }, 1.4)
+      .to(".pre__center", { opacity: 0, scale: 0.9, duration: 0.4 }, 1.35);
     return () => { tl.kill(); };
   }, [onDone]);
   return (
@@ -136,8 +181,8 @@ export function useRouteCurtain() {
     tl.set(".curtain", { display: "block" })
       .fromTo(".curtain__l", { xPercent: -100 }, { xPercent: 0, duration: 0.01 })
       .fromTo(".curtain__r", { xPercent: 100 }, { xPercent: 0, duration: 0.01 }, 0)
-      .to(".curtain__l", { xPercent: -100, duration: 1.1, ease: "expo.inOut", delay: 0.05 })
-      .to(".curtain__r", { xPercent: 100, duration: 1.1, ease: "expo.inOut" }, "<")
+      .to(".curtain__l", { xPercent: -100, duration: 0.8, ease: "expo.inOut", delay: 0.05 })
+      .to(".curtain__r", { xPercent: 100, duration: 0.8, ease: "expo.inOut" }, "<")
       .fromTo(".curtain__logo", { opacity: 1 }, { opacity: 0, duration: 0.3 }, "<")
       .set(".curtain", { display: "none" });
     return () => { tl.kill(); };
@@ -175,8 +220,8 @@ export function PageHead({ crumbs, eyebrow, title, lead, aside, children }: {
   useEffect(() => {
     if (!ref.current || prefersReduced()) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(".ph__word > span", { yPercent: 115 }, { yPercent: 0, duration: 1.2, stagger: 0.05, ease: "expo.out", delay: 0.35 });
-      gsap.fromTo(".ph__fade", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 1, stagger: 0.08, ease: "expo.out", delay: 0.55 });
+      gsap.fromTo(".ph__word > span", { yPercent: 115 }, { yPercent: 0, duration: 0.95, stagger: 0.04, ease: "expo.out", delay: 0.25 });
+      gsap.fromTo(".ph__fade", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.06, ease: "expo.out", delay: 0.4 });
     }, ref);
     return () => ctx.revert();
   }, [title]);
